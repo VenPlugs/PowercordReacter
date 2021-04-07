@@ -89,7 +89,7 @@ module.exports = class Reacter extends Plugin {
         if (!emoji) continue;
         result.push(emoji);
       } else if ((match = arg.match(this.emojiRegex))) {
-        result.push({ name: arg });
+        result.push({ name: match });
       } else {
         const matches = emojis.filter((e) => e.name === arg);
         if (matches.length) result = result.concat(matches);
