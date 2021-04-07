@@ -15,7 +15,7 @@ module.exports = class Reacter extends Plugin {
       command: "react",
       description:
         "React to a message with the provided emojis/emotes, or all emojis matching a certain name",
-      usage: "<MESSAGE_ID> <EMOJI | CUSTOM_EMOTE | EMOJI_NAME>",
+      usage: "<MESSAGE_ID> <EMOJI | CUSTOM_EMOTE | EMOTE_NAME>",
       executor: this.run.bind(this),
     });
   }
