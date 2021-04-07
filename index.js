@@ -36,10 +36,14 @@ module.exports = class Reacter extends Plugin {
         result: "You didn't give me a valid message ID.",
       };
 
-    let emojis = this.parseEmojis(args.join(""));
+    let emojis = this.parseEmojis(args.join("")).filter(
+      (e) => !this.hasReacted(msg, e)
+    );
+
     if (!emojis.length)
       return {
-        result: "You didn't specify any emojis.",
+        result:
+          "You didn't specify any emojis or you already reacted with all specified emojis.",
       };
 
     if (msg.reactions) {
@@ -56,8 +60,6 @@ module.exports = class Reacter extends Plugin {
     }
 
     for (const emoji of emojis) {
-      if (this.hasReaction(msg, emoji)) continue;
-
       addReaction(channelId, msgId, emoji);
       await new Promise((resolve) => setTimeout(resolve, 350));
     }
@@ -87,13 +89,15 @@ module.exports = class Reacter extends Plugin {
     );
   }
 
-  hasReaction(msg, emoji) {
+  hasReacted(msg, emoji) {
     return Boolean(
       msg.reactions &&
         msg.reactions.find(
           (r) =>
-            (r && r.emoji && r.emoji.name === emoji.name) ||
-            r.emoji.id === emoji.id
+            r &&
+            r.me &&
+            r.emoji &&
+            (r.emoji.name === emoji.name || r.emoji.id === emoji.id)
         )
     );
   }

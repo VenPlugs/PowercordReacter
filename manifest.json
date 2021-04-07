@@ -1,7 +1,7 @@
 {
   "name": "Reacter",
-  "version": "0.1.0",
-  "description": "React to messages via a command",
+  "version": "1.0.0",
+  "description": "React to messages via command",
   "author": "Vendicated",
   "license": "GPL-3.0"
 }
