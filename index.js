@@ -119,8 +119,7 @@ module.exports = class Reacter extends Plugin {
             r &&
             r.me &&
             r.emoji &&
-            ((r.emoji.id && r.emoji.id === emoji.id) ||
-              (!r.emoji.id && r.emoji.name === emoji.name))
+            (r.emoji.id ? r.emoji.id === emoji.id : r.emoji.name === emoji.name)
         )
     );
   }
