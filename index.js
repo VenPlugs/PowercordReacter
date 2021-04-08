@@ -38,7 +38,9 @@ module.exports = class Reacter extends Plugin {
         result: "You didn't give me a valid message ID.",
       };
 
-    let emojis = this.parseEmojis(args).filter((e) => !this.hasReacted(msg, e));
+    let emojis = this.parseEmojis([...new Set(args)].join("")).filter(
+      (e) => !this.hasReacted(msg, e)
+    );
 
     if (!emojis.length)
       return {
@@ -76,25 +78,27 @@ module.exports = class Reacter extends Plugin {
     return Object.values(emojiStore.getGuilds()).flatMap((g) => g.emojis);
   }
 
-  parseEmojis(args) {
-    args = [...new Set(args)];
-
+  parseEmojis(str) {
     let result = [];
     const emojis = this.getEmojis();
-
-    for (const arg of args) {
+    const { emoteRegex, emojiRegex } = this;
       let match;
-      if ((match = arg.match(this.emoteRegex))) {
+
+    while ((match = emoteRegex.exec(str))) {
+      str = str.replace(match[0], "");
         const emoji = emojis.find((e) => e.id === match[3]);
         if (!emoji) continue;
         result.push(emoji);
-      } else if ((match = arg.match(this.emojiRegex))) {
-        result.push({ name: match });
-      } else {
+    }
+    while ((match = emojiRegex.exec(str))) {
+      str = str.replace(match[0], "");
+      result.push({ name: match[0] });
+    }
+
+    for (const arg of str.trim().split(/ +/)) {
         const matches = emojis.filter((e) => e.name === arg);
         if (matches.length) result = result.concat(matches);
       }
-    }
 
     return [...new Set(result)];
   }
