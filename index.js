@@ -82,13 +82,13 @@ module.exports = class Reacter extends Plugin {
     let result = [];
     const emojis = this.getEmojis();
     const { emoteRegex, emojiRegex } = this;
-      let match;
+    let match;
 
     while ((match = emoteRegex.exec(str))) {
       str = str.replace(match[0], "");
-        const emoji = emojis.find((e) => e.id === match[3]);
-        if (!emoji) continue;
-        result.push(emoji);
+      const emoji = emojis.find((e) => e.id === match[3]);
+      if (!emoji) continue;
+      result.push(emoji);
     }
     while ((match = emojiRegex.exec(str))) {
       str = str.replace(match[0], "");
@@ -96,9 +96,9 @@ module.exports = class Reacter extends Plugin {
     }
 
     for (const arg of str.trim().split(/ +/)) {
-        const matches = emojis.filter((e) => e.name === arg);
-        if (matches.length) result = result.concat(matches);
-      }
+      const matches = emojis.filter((e) => e.name === arg);
+      if (matches.length) result = result.concat(matches);
+    }
 
     return [...new Set(result)];
   }
@@ -119,7 +119,8 @@ module.exports = class Reacter extends Plugin {
             r &&
             r.me &&
             r.emoji &&
-            (r.emoji.name === emoji.name || r.emoji.id === emoji.id)
+            ((r.emoji.id && r.emoji.id === emoji.id) ||
+              (!r.emoji.id && r.emoji.name === emoji.name))
         )
     );
   }
