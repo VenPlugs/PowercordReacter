@@ -112,8 +112,20 @@ module.exports = class Reacter extends Plugin {
       result.push({ name: match[0] });
     }
 
-    for (const arg of str.trim().split(/ +/)) {
-      const matches = emojis.filter((e) => e.name === arg);
+    for (const arg of str.trim().toLowerCase().split(/ +/)) {
+      let fn;
+      if (arg.startsWith("*")) {
+        if (arg.endsWith("*")) fn = s => s.includes(arg.slice(1, -1))
+        else fn = s => s.endsWith(arg.slice(1))
+      } else if (arg.endsWith("*")) {
+        fn = s => s.startsWith(arg.slice(0, -1));
+      } else if (arg.includes("*")) {
+        const [left, right] = arg.split("*");
+        fn = s => s.startsWith(left) && s.endsWith(right);
+      } else {
+        fn = s => s === arg;
+      }
+      const matches = emojis.filter(e => fn(e.name.toLowerCase()));
       if (matches.length) result = result.concat(matches);
     }
 
