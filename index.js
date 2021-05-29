@@ -1,18 +1,9 @@
 /* Reacter, a Powercord plugin to make reacting to messages easier
  * Copyright (C) 2021 Vendicated
  *
- * Reacter is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Reacter is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Reacter.  If not, see <https://www.gnu.org/licenses/>.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
 const { getModule } = require("powercord/webpack");
@@ -30,10 +21,9 @@ module.exports = class Reacter extends Plugin {
   async startPlugin() {
     powercord.api.commands.registerCommand({
       command: "react",
-      description:
-        "React to a message with the provided emojis/emotes, or all emojis matching a certain name",
+      description: "React to a message with the provided emojis/emotes, or all emojis matching a certain name",
       usage: "<MESSAGE_ID> <EMOJI | CUSTOM_EMOTE | EMOTE_NAME>",
-      executor: this.run.bind(this),
+      executor: this.run.bind(this)
     });
   }
 
@@ -45,31 +35,27 @@ module.exports = class Reacter extends Plugin {
     const channelId = getChannelId();
     if (!this.canReact(getChannel(channelId)))
       return {
-        result: "You do not have permissions to add reactions in this channel.",
+        result: "You do not have permissions to add reactions in this channel."
       };
 
     const msgId = args.shift();
     const msg = msgId && getMessage(channelId, msgId);
     if (!msg)
       return {
-        result: "You didn't give me a valid message ID.",
+        result: "You didn't give me a valid message ID."
       };
 
-    let emojis = this.parseEmojis([...new Set(args)].join("")).filter(
-      (e) => !this.hasReacted(msg, e)
-    );
+    let emojis = this.parseEmojis([...new Set(args)].join("")).filter(e => !this.hasReacted(msg, e));
 
     if (!emojis.length)
       return {
-        result:
-          "You didn't specify any emojis or you already reacted with all specified emojis.",
+        result: "You didn't specify any emojis or you already reacted with all specified emojis."
       };
 
     if (msg.reactions) {
       if (msg.reactions.length >= 20)
         return {
-          result:
-            "That message already has the maximum amount of reactions (20).",
+          result: "That message already has the maximum amount of reactions (20)."
         };
 
       const reactionsLeft = 20 - msg.reactions.length;
@@ -80,7 +66,7 @@ module.exports = class Reacter extends Plugin {
 
     for (const emoji of emojis) {
       addReaction(channelId, msgId, emoji);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
   }
 
@@ -92,7 +78,7 @@ module.exports = class Reacter extends Plugin {
   }
 
   getEmojis() {
-    return Object.values(emojiStore.getGuilds()).flatMap((g) => g.emojis);
+    return Object.values(emojiStore.getGuilds()).flatMap(g => g.emojis);
   }
 
   parseEmojis(str) {
@@ -103,7 +89,7 @@ module.exports = class Reacter extends Plugin {
 
     while ((match = emoteRegex.exec(str))) {
       str = str.replace(match[0], "");
-      const emoji = emojis.find((e) => e.id === match[3]);
+      const emoji = emojis.find(e => e.id === match[3]);
       if (!emoji) continue;
       result.push(emoji);
     }
@@ -115,8 +101,8 @@ module.exports = class Reacter extends Plugin {
     for (const arg of str.trim().toLowerCase().split(/ +/)) {
       let fn;
       if (arg.startsWith("*")) {
-        if (arg.endsWith("*")) fn = s => s.includes(arg.slice(1, -1))
-        else fn = s => s.endsWith(arg.slice(1))
+        if (arg.endsWith("*")) fn = s => s.includes(arg.slice(1, -1));
+        else fn = s => s.endsWith(arg.slice(1));
       } else if (arg.endsWith("*")) {
         fn = s => s.startsWith(arg.slice(0, -1));
       } else if (arg.includes("*")) {
@@ -141,15 +127,6 @@ module.exports = class Reacter extends Plugin {
   }
 
   hasReacted(msg, emoji) {
-    return Boolean(
-      msg.reactions &&
-        msg.reactions.find(
-          (r) =>
-            r &&
-            r.me &&
-            r.emoji &&
-            (r.emoji.id ? r.emoji.id === emoji.id : r.emoji.name === emoji.name)
-        )
-    );
+    return Boolean(msg.reactions && msg.reactions.find(r => r && r.me && r.emoji && (r.emoji.id ? r.emoji.id === emoji.id : r.emoji.name === emoji.name)));
   }
 };
